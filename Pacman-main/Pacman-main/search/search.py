@@ -72,6 +72,10 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
+
+
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -88,44 +92,59 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
    
-    stack = util.Stack()  
+    # Create a stack for storing states to visit
+    stack = util.Stack()
+    # Create a set to keep track of visited states
     visited = set()
-
+    # Push the start state and an empty path into the stack
     stack.push((problem.getStartState(), []))
 
+    # While there are still states to process
     while not stack.isEmpty():
+    # Get the current state and the path to reach it
         current_state, path = stack.pop()
 
+    # Check if the current state is the goal state
         if problem.isGoalState(current_state):
-            return path
+        # If yes, return the path to the goal
+         return path
 
+    # If the current state has not been visited
         if current_state not in visited:
-            visited.add(current_state)
+        # Mark the current state as visited
+         visited.add(current_state)
 
-            for successor, action, _ in problem.getSuccessors(current_state):
-                if successor not in visited:
-                    stack.push((successor, path + [action]))
+        # Get all successors (neighboring states) of the current state
+         for successor, action, _ in problem.getSuccessors(current_state):
+            # If the successor state has not been visited
+            if successor not in visited:
+                # Add the successor and the updated path to the stack
+                stack.push((successor, path + [action]))
 
-   
+    # If the goal state is not found, return an empty path
     return []
+
+
+
+
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     #util.raiseNotDefined()
-    """ Search the shallowest nodes in the search tree first. """
-    currPath = []           # The path that is popped from the frontier in each loop
-    currState =  problem.getStartState()    # The state(position) that is popped for the frontier in each loop
+    
+    currPath = []# The path that is popped from the frontier in each loop
+    currState =  problem.getStartState() # The state(position) that is popped for the frontier in each loop
     print(f"currState: {currState}")
-    if problem.isGoalState(currState):     # Checking if the start state is also a goal state
+    if problem.isGoalState(currState): # Checking if the start state is also a goal state
         return currPath
 
     frontier = Queue()
-    frontier.push( (currState, currPath) )     # Insert just the start state, in order to pop it first
+    frontier.push( (currState, currPath) )# Insert just the start state, in order to pop it first
     explored = set()
     while not frontier.isEmpty():
-        currState, currPath = frontier.pop()    # Popping a state and the corresponding path
+        currState, currPath = frontier.pop() # Popping a state and the corresponding path
         # To pass autograder.py question2:
         if problem.isGoalState(currState):
             return currPath
@@ -133,17 +152,62 @@ def breadthFirstSearch(problem):
         frontierStates = [ t[0] for t in frontier.list ]
         for s in problem.getSuccessors(currState):
             if s[0] not in explored and s[0] not in frontierStates:
-                # Lecture code:
                 # if problem.isGoalState(s[0]):
-                #     return currPath + [s[1]]
-                frontier.push( (s[0], currPath + [s[1]]) )      # Adding the successor and its path to the frontier
+                #  return currPath + [s[1]]
+                frontier.push( (s[0], currPath + [s[1]]) )# Adding the successor and its path to the frontier
 
-    return []       # If this point is reached, a solution could not be found.
+    return []  # If this point is reached, a solution could not be found.
+
+
+
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+     # Priority Queue to manage nodes to explore, prioritized by cost
+    frontier = util.PriorityQueue()
+    
+    # Set to track visited states
+    visited = set()
+    
+    # Get the starting state of the problem
+    start_state = problem.getStartState()
+    
+    # Push the start state into the priority queue with an initial cost of 0
+    # Each element in the queue is a tuple: (state, path, total_cost)
+    frontier.push((start_state, [], 0), 0)  # The priority is the cost (0 initially)
+
+    # While there are still nodes in the priority queue
+    while not frontier.isEmpty():
+        # Pop the node with the lowest cost
+        cur_state, path, cost = frontier.pop()
+
+        # If the current state is the goal, return the path to the goal
+        if problem.isGoalState(cur_state):
+            return path
+
+        # If the current state has not been visited
+        if cur_state not in visited:
+            # Mark the state as visited
+            visited.add(cur_state)
+
+            # Explore the successors (neighbors) of the current state
+            for successor, action, step_cost in problem.getSuccessors(cur_state):
+                # Calculate the total cost to reach the successor
+                total_cost = cost + step_cost
+                
+                # Push the successor into the priority queue with the updated cost
+                frontier.push((successor, path + [action], total_cost), total_cost)
+
+    # If no solution is found, return an empty path
+    return []
+
+
+    
+
+
+    
 
 def nullHeuristic(state, problem=None):
     """
